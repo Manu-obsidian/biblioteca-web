@@ -1,0 +1,68 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookTrack</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <main class="page">
+        <section class="hero">
+            <div>
+                <p class="eyebrow">Biblioteca pessoal</p>
+                <h1>BookTrack</h1>
+                <p class="intro">Organize suas leituras, acompanhe o que está em andamento e guarde suas resenhas em um só lugar.</p>
+            </div>
+            <a class="admin-link" href="/admin/">Abrir admin</a>
+        </section>
+
+        <section class="stats" aria-label="Resumo da biblioteca">
+            <article>
+                <span>{{ total_livros }}</span>
+                <p>livros cadastrados</p>
+            </article>
+            <article>
+                <span>{{ lendo_agora }}</span>
+                <p>leituras atuais</p>
+            </article>
+            <article>
+                <span>{{ livros_lidos }}</span>
+                <p>livros lidos</p>
+            </article>
+        </section>
+
+        <section class="library">
+            <div class="section-heading">
+                <h2>Minha estante</h2>
+                <p>Cadastre livros pelo admin do Django para eles aparecerem aqui.</p>
+            </div>
+
+            {% if livros %}
+                <div class="book-grid">
+                    {% for livro in livros %}
+                        <article class="book-card">
+                            <span class="status">{{ livro.get_status_display }}</span>
+                            <h3>{{ livro.titulo }}</h3>
+                            <p class="author">{{ livro.autor }}</p>
+                            {% if livro.nota %}
+                                <p class="rating">Nota {{ livro.nota }}/5</p>
+                            {% endif %}
+                            {% if livro.resenha %}
+                                <p class="review">{{ livro.resenha|truncatewords:24 }}</p>
+                            {% endif %}
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <h3>Nenhum livro cadastrado ainda</h3>
+                    <p>Entre no admin, adicione o primeiro livro e volte para ver sua biblioteca ganhar forma.</p>
+                </div>
+            {% endif %}
+        </section>
+    </main>
+</body>
+</html>

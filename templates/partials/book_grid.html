@@ -1,0 +1,47 @@
+{% if livros %}
+    <div class="book-grid">
+        {% for livro in livros %}
+            <article class="book-card">
+                <a class="book-cover" href="{% url 'detalhe_livro' livro.id %}" aria-label="Abrir {{ livro.titulo }}">
+                    {% if livro.capa %}
+                        <img src="{{ livro.capa.url }}" alt="Capa de {{ livro.titulo }}">
+                    {% else %}
+                        <span>{{ livro.titulo|slice:":1" }}</span>
+                    {% endif %}
+                </a>
+                <div class="book-details">
+                    <div class="book-topline">
+                        <span>{{ livro.get_status_display }}</span>
+                        {% if livro.favorito %}
+                            <strong>Favorito</strong>
+                        {% endif %}
+                    </div>
+                    <h3><a href="{% url 'detalhe_livro' livro.id %}">{{ livro.titulo }}</a></h3>
+                    <p>{{ livro.autor }}{% if livro.ano %} &bull; {{ livro.ano }}{% endif %}</p>
+                    <p>{{ livro.genero|default:"Gênero não informado" }} &bull; {{ livro.get_formato_display }}</p>
+
+                    {% if livro.status == "lendo" and livro.total_paginas %}
+                        <div class="progress-bar" aria-label="Progresso {{ livro.progresso_percentual }}%">
+                            <span style="width: {{ livro.progresso_percentual }}%"></span>
+                        </div>
+                        <p class="progress-text">Página {{ livro.pagina_atual }} de {{ livro.total_paginas }}</p>
+                    {% endif %}
+
+                    {% if livro.nota %}
+                        <p class="rating" aria-label="Nota {{ livro.nota }} de 5">
+                            {% for item in "12345" %}
+                                {% if forloop.counter <= livro.nota %}&#9733;{% else %}&#9734;{% endif %}
+                            {% endfor %}
+                        </p>
+                    {% endif %}
+
+                    <a class="open-book" href="{% url 'detalhe_livro' livro.id %}">Abrir detalhes</a>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <p>{{ empty_message }}</p>
+    </div>
+{% endif %}

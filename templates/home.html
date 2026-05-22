@@ -5,63 +5,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BookTrack</title>
+    <title>BookTracker</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <main class="page">
-        <section class="hero">
-            <div>
-                <p class="eyebrow">Biblioteca pessoal</p>
-                <h1>BookTrack</h1>
-                <p class="intro">Organize suas leituras, acompanhe o que está em andamento e guarde suas resenhas em um só lugar.</p>
-            </div>
-            <a class="admin-link" href="/admin/">Abrir admin</a>
-        </section>
+    <main class="layout">
+        <aside class="sidebar" aria-label="Menu principal">
+            <a class="brand" href="{% url 'home' %}" aria-label="BookTracker">BookTracker</a>
+            <nav class="menu">
+                <a class="{% if active_page == 'home' %}active{% endif %}" href="{% url 'home' %}">
+                    <img src="{% static 'img/icons/home.png' %}" alt="Home" class="icon-img">
+                    <strong>Home</strong>
+                </a>
+                <a class="{% if active_page == 'favoritos' %}active{% endif %}" href="{% url 'favoritos' %}">
+                    <img src="{% static 'img/icons/favoritos.png' %}" alt="Favoritos" class="icon-img">
+                    <strong>Favoritos</strong>
+                </a>
+                <a class="{% if active_page == 'lendo' %}active{% endif %}" href="{% url 'lendo' %}">
+                    <img src="{% static 'img/icons/lendo.png' %}" alt="Lendo" class="icon-img">
+                    <strong>Lendo</strong>
+                </a>
+                <a class="{% if active_page == 'lidos' %}active{% endif %}" href="{% url 'lidos' %}">
+                    <img src="{% static 'img/icons/lidos.png' %}" alt="Lidos" class="icon-img">
+                    <strong>Lidos</strong>
+                </a>
+                <a class="{% if active_page == 'pretendo-ler' %}active{% endif %}" href="{% url 'pretendo_ler' %}">
+                    <img src="{% static 'img/icons/ler.png' %}" alt="Ler" class="icon-img">
+                    <strong>Pretendo ler</strong>
+                </a>
+            </nav>
+        </aside>
 
-        <section class="stats" aria-label="Resumo da biblioteca">
-            <article>
-                <span>{{ total_livros }}</span>
-                <p>livros cadastrados</p>
-            </article>
-            <article>
-                <span>{{ lendo_agora }}</span>
-                <p>leituras atuais</p>
-            </article>
-            <article>
-                <span>{{ livros_lidos }}</span>
-                <p>livros lidos</p>
-            </article>
-        </section>
-
-        <section class="library">
-            <div class="section-heading">
-                <h2>Minha estante</h2>
-                <p>Cadastre livros pelo admin do Django para eles aparecerem aqui.</p>
-            </div>
-
-            {% if livros %}
-                <div class="book-grid">
-                    {% for livro in livros %}
-                        <article class="book-card">
-                            <span class="status">{{ livro.get_status_display }}</span>
-                            <h3>{{ livro.titulo }}</h3>
-                            <p class="author">{{ livro.autor }}</p>
-                            {% if livro.nota %}
-                                <p class="rating">Nota {{ livro.nota }}/5</p>
-                            {% endif %}
-                            {% if livro.resenha %}
-                                <p class="review">{{ livro.resenha|truncatewords:24 }}</p>
-                            {% endif %}
-                        </article>
-                    {% endfor %}
+        <section class="content">
+            <header class="page-header">
+                <div>
+                    <p class="eyebrow">Minha biblioteca</p>
+                    <h1>{{ titulo_pagina }}</h1>
+                    <p>{{ descricao_pagina }}</p>
                 </div>
-            {% else %}
-                <div class="empty-state">
-                    <h3>Nenhum livro cadastrado ainda</h3>
-                    <p>Entre no admin, adicione o primeiro livro e volte para ver sua biblioteca ganhar forma.</p>
-                </div>
+                <form class="search-form" method="get" role="search">
+                    <label for="q">Pesquisar livro</label>
+                    <input id="q" name="q" type="search" value="{{ query }}" placeholder="Pesquisar por título, autor, gênero, sinopse ou resenha">
+                    <button type="submit">Buscar</button>
+                </form>
+            </header>
+
+            <section class="stats" aria-label="Resumo">
+                <article>
+                    <span>{{ total_livros }}</span>
+                    <p>Total</p>
+                </article>
+                <article>
+                    <span>{{ lendo_agora }}</span>
+                    <p>Lendo</p>
+                </article>
+                <article>
+                    <span>{{ livros_lidos }}</span>
+                    <p>Lidos</p>
+                </article>
+                <article>
+                    <span>{{ pretendo_ler }}</span>
+                    <p>Pretendo ler</p>
+                </article>
+            </section>
+
+            {% if mostrar_cadastro %}
+                <section class="home-grid">
+                    <form class="book-form" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="section-title">
+                            <h2>Cadastrar livro</h2>
+                            <p>Adicione um livro sem sair da tela inicial.</p>
+                        </div>
+
+                        <div class="form-grid">
+                            <label>
+                                {{ form.titulo.label }}
+                                {{ form.titulo }}
+                            </label>
+                            <label>
+                                {{ form.capa.label }}
+                                {{ form.capa }}
+                            </label>
+                            <label>
+                                {{ form.ano.label }}
+                                {{ form.ano }}
+                            </label>
+                            <label>
+                                {{ form.genero.label }}
+                                {{ form.genero }}
+                            </label>
+                            <label>
+                                {{ form.autor.label }}
+                                {{ form.autor }}
+                            </label>
+                            <label>
+                                {{ form.formato.label }}
+                                {{ form.formato }}
+                            </label>
+                            <label>
+                                {{ form.total_paginas.label }}
+                                {{ form.total_paginas }}
+                            </label>
+                        </div>
+
+                        <label>
+                            {{ form.sinopse.label }}
+                            {{ form.sinopse }}
+                        </label>
+
+                        {% if form.errors %}
+                            <p class="form-error">Revise os campos antes de salvar.</p>
+                        {% endif %}
+
+                        <button type="submit">Salvar livro</button>
+                    </form>
+
+                    <section class="continue-card">
+                        <div class="section-title">
+                            <h2>Continuar lendo</h2>
+                            <p>Livros marcados como lendo.</p>
+                        </div>
+                        {% if livros_lendo %}
+                            <div class="mini-list">
+                                {% for livro in livros_lendo %}
+                                    <article>
+                                        <span>{{ livro.titulo|slice:":1" }}</span>
+                                        <div>
+                                            <h3>{{ livro.titulo }}</h3>
+                                            <p>{{ livro.autor }}</p>
+                                        </div>
+                                    </article>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="empty-text">Quando você marcar livros como lendo, eles aparecem aqui.</p>
+                        {% endif %}
+                    </section>
+                </section>
+
+                <section class="recent-section">
+                    <div class="section-title">
+                        <h2>Adicionados recentemente</h2>
+                        <p>Os últimos livros cadastrados.</p>
+                    </div>
+                    {% include "partials/book_grid.html" with livros=livros_recentes empty_message="Nenhum livro cadastrado ainda." %}
+                </section>
             {% endif %}
+
+            <section class="books-section">
+                <div class="section-title">
+                    <h2>{% if mostrar_cadastro %}Todos os livros{% else %}{{ titulo_pagina }}{% endif %}</h2>
+                    {% if query %}
+                        <p>Resultado para "{{ query }}".</p>
+                    {% else %}
+                        <p>Cards dos livros desta categoria.</p>
+                    {% endif %}
+                </div>
+                {% include "partials/book_grid.html" with livros=livros empty_message="Nenhum livro encontrado." %}
+            </section>
         </section>
     </main>
 </body>

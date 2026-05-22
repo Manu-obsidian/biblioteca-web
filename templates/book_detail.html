@@ -1,0 +1,183 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ livro.titulo }} | BookTracker</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <main class="layout">
+        <aside class="sidebar" aria-label="Menu principal">
+            <a class="brand" href="{% url 'home' %}" aria-label="BookTracker">BookTracker</a>
+            <nav class="menu">
+                <a href="{% url 'home' %}">
+                    <span class="icon home-icon"></span>
+                    <strong>Home</strong>
+                </a>
+                <a href="{% url 'favoritos' %}">
+                    <span class="icon favorite-icon"></span>
+                    <strong>Favoritos</strong>
+                </a>
+                <a href="{% url 'lendo' %}">
+                    <span class="icon reading-icon"></span>
+                    <strong>Lendo</strong>
+                </a>
+                <a href="{% url 'lidos' %}">
+                    <span class="icon done-icon"></span>
+                    <strong>Lidos</strong>
+                </a>
+                <a href="{% url 'pretendo_ler' %}">
+                    <span class="icon planned-icon"></span>
+                    <strong>Pretendo ler</strong>
+                </a>
+            </nav>
+        </aside>
+
+        <section class="content">
+            <a class="back-link" href="{% url 'home' %}">Voltar para a biblioteca</a>
+
+            <section class="detail-hero">
+                {% if livro.capa %}
+                    <img class="detail-cover image-cover" src="{{ livro.capa.url }}" alt="Capa de {{ livro.titulo }}">
+                {% else %}
+                    <div class="detail-cover">
+                        <span>{{ livro.titulo|slice:":1" }}</span>
+                    </div>
+                {% endif %}
+                <div>
+                    <p class="eyebrow">{{ livro.get_formato_display }}</p>
+                    <h1>{{ livro.titulo }}</h1>
+                    <p>{{ livro.autor }}{% if livro.ano %} &bull; {{ livro.ano }}{% endif %}</p>
+                    <p>{{ livro.genero|default:"Gênero não informado" }}</p>
+                    {% if livro.sinopse %}
+                        <p class="detail-synopsis">{{ livro.sinopse }}</p>
+                    {% endif %}
+                </div>
+            </section>
+
+            <section class="detail-grid">
+                <article class="detail-card">
+                    <div class="section-title">
+                        <h2>Acompanhamento</h2>
+                        <p>Altere o estado da leitura e marque favoritos.</p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="status">
+                        <div class="card-actions large" aria-label="Estado de leitura">
+                            {% for value, label in livro.STATUS_CHOICES %}
+                                <button class="{% if livro.status == value %}active{% endif %}" type="submit" name="status" value="{{ value }}">
+                                    {{ label }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </form>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="favorito">
+                        <button class="favorite-toggle detail {% if livro.favorito %}active{% endif %}" type="submit">
+                            {% if livro.favorito %}Remover dos favoritos{% else %}Adicionar aos favoritos{% endif %}
+                        </button>
+                    </form>
+
+                    {% if livro.status == "lendo" %}
+                        <form class="progress-form detail" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="progresso">
+                            <label>
+                                Página atual{% if livro.total_paginas %} de {{ livro.total_paginas }}{% endif %}
+                                <input name="pagina_atual" type="number" min="0" {% if livro.total_paginas %}max="{{ livro.total_paginas }}"{% endif %} value="{{ livro.pagina_atual }}">
+                            </label>
+                            {% if livro.total_paginas %}
+                                <div class="progress-bar" aria-label="Progresso {{ livro.progresso_percentual }}%">
+                                    <span style="width: {{ livro.progresso_percentual }}%"></span>
+                                </div>
+                                <p class="progress-text">{{ livro.progresso_percentual }}% concluído</p>
+                            {% endif %}
+                            <button type="submit">Atualizar página</button>
+                        </form>
+                    {% endif %}
+                </article>
+
+                <article class="detail-card">
+                    <div class="section-title">
+                        <h2>Avaliação</h2>
+                        <p>A nota e a resenha aparecem quando o livro está marcado como lido.</p>
+                    </div>
+
+                    {% if livro.status == "lido" %}
+                        <form class="review-form detail" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="avaliacao">
+                            <div class="field-group compact">
+                                <span class="field-label">Sua nota</span>
+                                <div class="rating-buttons small">
+                                    <label>
+                                        <input type="radio" name="nota" value="" {% if not livro.nota %}checked{% endif %}>
+                                        <span>Sem nota</span>
+                                    </label>
+                                    {% for item in "12345" %}
+                                        <label>
+                                            <input type="radio" name="nota" value="{{ forloop.counter }}" {% if livro.nota == forloop.counter %}checked{% endif %}>
+                                            <span>&#9733;</span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <label>
+                                Resenha
+                                <textarea name="resenha" rows="7" placeholder="O que você achou?">{{ livro.resenha }}</textarea>
+                            </label>
+                            <button type="submit">Salvar avaliação</button>
+                        </form>
+                    {% else %}
+                        <div class="empty-state">
+                            <p>Marque este livro como lido para liberar nota em estrelas e resenha.</p>
+                        </div>
+                    {% endif %}
+                </article>
+
+                <article class="detail-card wide">
+                    <div class="section-title">
+                        <h2>Editar dados da obra</h2>
+                        <p>Use para corrigir título, autor, formato, páginas ou sinopse.</p>
+                    </div>
+
+                    <form class="book-form flat" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="dados">
+                        <div class="form-grid">
+                            <label>{{ form.titulo.label }}{{ form.titulo }}</label>
+                            <label>{{ form.capa.label }}{{ form.capa }}</label>
+                            <label>{{ form.ano.label }}{{ form.ano }}</label>
+                            <label>{{ form.genero.label }}{{ form.genero }}</label>
+                            <label>{{ form.autor.label }}{{ form.autor }}</label>
+                            <label>{{ form.formato.label }}{{ form.formato }}</label>
+                            <label>{{ form.total_paginas.label }}{{ form.total_paginas }}</label>
+                        </div>
+                        <label>{{ form.sinopse.label }}{{ form.sinopse }}</label>
+                        <button type="submit">Salvar alterações</button>
+                    </form>
+                </article>
+
+                <article class="detail-card danger-zone wide">
+                    <div>
+                        <h2>Apagar livro</h2>
+                        <p>Essa ação remove o livro da sua biblioteca.</p>
+                    </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="apagar">
+                        <button type="submit" onclick="return confirm('Apagar este livro da biblioteca?')">Apagar livro</button>
+                    </form>
+                </article>
+            </section>
+        </section>
+    </main>
+</body>
+</html>

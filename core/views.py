@@ -8,7 +8,7 @@ from .models import Livro
 STATUS_PAGES = {
     "lendo": ("Lendo", "Livros que você está lendo agora."),
     "lidos": ("Lidos", "Livros que você já terminou."),
-    "pretendo-ler": ("Pretendo ler", "Livros guardados para ler depois."),
+    "pretendo-ler": ("Wishlist", "Livros guardados para ler depois."),
 }
 
 

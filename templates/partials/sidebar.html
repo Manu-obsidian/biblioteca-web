@@ -1,0 +1,60 @@
+{% load static %}
+<aside class="sidebar" aria-label="Menu principal">
+    <a class="brand" href="{% url 'home' %}" aria-label="BookTracker">
+        BookTracker
+    </a>
+
+    <nav class="menu">
+
+        <a class="{% if active_page == 'home' %}active{% endif %}"
+           href="{% url 'home' %}">
+            <span class="icon-wrapper">
+                <img src="{% static 'img/icons/home.png' %}"
+                     alt="Home"
+                     class="icon-img">
+            </span>
+            <strong>Home</strong>
+        </a>
+
+        <a class="{% if active_page == 'favoritos' %}active{% endif %}"
+           href="{% url 'favoritos' %}">
+            <span class="icon-wrapper">
+                <img src="{% static 'img/icons/favoritos.png' %}"
+                     alt="Favoritos"
+                     class="icon-img">
+            </span>
+            <strong>Favoritos</strong>
+        </a>
+
+        <a class="{% if active_page == 'lendo' %}active{% endif %}"
+           href="{% url 'lendo' %}">
+            <span class="icon-wrapper">
+                <img src="{% static 'img/icons/lendo.png' %}"
+                     alt="Lendo"
+                     class="icon-img">
+            </span>
+            <strong>Lendo</strong>
+        </a>
+
+        <a class="{% if active_page == 'lidos' %}active{% endif %}"
+           href="{% url 'lidos' %}">
+            <span class="icon-wrapper">
+                <img src="{% static 'img/icons/lidos.png' %}"
+                     alt="Lidos"
+                     class="icon-img">
+            </span>
+            <strong>Lidos</strong>
+        </a>
+
+        <a class="{% if active_page == 'pretendo-ler' %}active{% endif %}"
+           href="{% url 'pretendo_ler' %}">
+            <span class="icon-wrapper">
+                <img src="{% static 'img/icons/ler.png' %}"
+                     alt="Wishlist"
+                     class="icon-img">
+            </span>
+            <strong>Wishlist</strong>
+        </a>
+
+    </nav>
+</aside>

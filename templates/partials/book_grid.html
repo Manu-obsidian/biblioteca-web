@@ -22,7 +22,7 @@
 
                     {% if livro.status == "lendo" and livro.total_paginas %}
                         <div class="progress-bar" aria-label="Progresso {{ livro.progresso_percentual }}%">
-                            <span style="width: {{ livro.progresso_percentual }}%"></span>
+                            <span class="progress-fill" style="--progress: {{ livro.progresso_percentual }}%"></span>
                         </div>
                         <p class="progress-text">Página {{ livro.pagina_atual }} de {{ livro.total_paginas }}</p>
                     {% endif %}

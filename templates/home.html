@@ -7,35 +7,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BookTracker</title>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/sidebar.css' %}">
 </head>
 <body>
     <main class="layout">
-        <aside class="sidebar" aria-label="Menu principal">
-            <a class="brand" href="{% url 'home' %}" aria-label="BookTracker">BookTracker</a>
-            <nav class="menu">
-                <a class="{% if active_page == 'home' %}active{% endif %}" href="{% url 'home' %}">
-                    <img src="{% static 'img/icons/home.png' %}" alt="Home" class="icon-img">
-                    <strong>Home</strong>
-                </a>
-                <a class="{% if active_page == 'favoritos' %}active{% endif %}" href="{% url 'favoritos' %}">
-                    <img src="{% static 'img/icons/favoritos.png' %}" alt="Favoritos" class="icon-img">
-                    <strong>Favoritos</strong>
-                </a>
-                <a class="{% if active_page == 'lendo' %}active{% endif %}" href="{% url 'lendo' %}">
-                    <img src="{% static 'img/icons/lendo.png' %}" alt="Lendo" class="icon-img">
-                    <strong>Lendo</strong>
-                </a>
-                <a class="{% if active_page == 'lidos' %}active{% endif %}" href="{% url 'lidos' %}">
-                    <img src="{% static 'img/icons/lidos.png' %}" alt="Lidos" class="icon-img">
-                    <strong>Lidos</strong>
-                </a>
-                <a class="{% if active_page == 'pretendo-ler' %}active{% endif %}" href="{% url 'pretendo_ler' %}">
-                    <img src="{% static 'img/icons/ler.png' %}" alt="Ler" class="icon-img">
-                    <strong>Pretendo ler</strong>
-                </a>
-            </nav>
-        </aside>
 
+        {% include "partials/sidebar.html" %}
+        
         <section class="content">
             <header class="page-header">
                 <div>
@@ -65,11 +43,11 @@
                 </article>
                 <article>
                     <span>{{ pretendo_ler }}</span>
-                    <p>Pretendo ler</p>
+                    <p>Wishlist</p>
                 </article>
             </section>
 
-            {% if mostrar_cadastro %}
+            {% if mostrar_cadastro and not query %}
                 <section class="home-grid">
                     <form class="book-form" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
@@ -157,9 +135,9 @@
                 <div class="section-title">
                     <h2>{% if mostrar_cadastro %}Todos os livros{% else %}{{ titulo_pagina }}{% endif %}</h2>
                     {% if query %}
-                        <p>Resultado para "{{ query }}".</p>
+                        <p>{{ livros|length }} resultado(s) para "{{ query }}".</p>
                     {% else %}
-                        <p>Cards dos livros desta categoria.</p>
+                        <p>Livros desta categoria.</p>
                     {% endif %}
                 </div>
                 {% include "partials/book_grid.html" with livros=livros empty_message="Nenhum livro encontrado." %}

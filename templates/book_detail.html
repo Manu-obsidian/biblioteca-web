@@ -10,31 +10,8 @@
 </head>
 <body>
     <main class="layout">
-        <aside class="sidebar" aria-label="Menu principal">
-            <a class="brand" href="{% url 'home' %}" aria-label="BookTracker">BookTracker</a>
-            <nav class="menu">
-                <a href="{% url 'home' %}">
-                    <span class="icon home-icon"></span>
-                    <strong>Home</strong>
-                </a>
-                <a href="{% url 'favoritos' %}">
-                    <span class="icon favorite-icon"></span>
-                    <strong>Favoritos</strong>
-                </a>
-                <a href="{% url 'lendo' %}">
-                    <span class="icon reading-icon"></span>
-                    <strong>Lendo</strong>
-                </a>
-                <a href="{% url 'lidos' %}">
-                    <span class="icon done-icon"></span>
-                    <strong>Lidos</strong>
-                </a>
-                <a href="{% url 'pretendo_ler' %}">
-                    <span class="icon planned-icon"></span>
-                    <strong>Pretendo ler</strong>
-                </a>
-            </nav>
-        </aside>
+
+        {% include "partials/sidebar.html" %}
 
         <section class="content">
             <a class="back-link" href="{% url 'home' %}">Voltar para a biblioteca</a>
@@ -95,7 +72,7 @@
                             </label>
                             {% if livro.total_paginas %}
                                 <div class="progress-bar" aria-label="Progresso {{ livro.progresso_percentual }}%">
-                                    <span style="width: {{ livro.progresso_percentual }}%"></span>
+                                    <span class="progress-fill" style="--progress: {{ livro.progresso_percentual }}%"></span>
                                 </div>
                                 <p class="progress-text">{{ livro.progresso_percentual }}% concluído</p>
                             {% endif %}
@@ -116,16 +93,23 @@
                             <input type="hidden" name="action" value="avaliacao">
                             <div class="field-group compact">
                                 <span class="field-label">Sua nota</span>
+
                                 <div class="rating-buttons small">
                                     <label>
                                         <input type="radio" name="nota" value="" {% if not livro.nota %}checked{% endif %}>
                                         <span>Sem nota</span>
                                     </label>
+
                                     {% for item in "12345" %}
-                                        <label>
-                                            <input type="radio" name="nota" value="{{ forloop.counter }}" {% if livro.nota == forloop.counter %}checked{% endif %}>
-                                            <span>&#9733;</span>
-                                        </label>
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name="nota"
+                                            value="{{ forloop.counter }}"
+                                            {% if livro.nota == forloop.counter %}checked{% endif %}
+                                        >
+                                        <span>&#9733;</span>
+                                    </label>
                                     {% endfor %}
                                 </div>
                             </div>
